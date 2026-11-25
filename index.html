@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="apple-mobile-web-app-title" content="Julekalender">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="theme-color" content="#26070e">
+    <meta name="robots" content="noindex,nofollow">
+    <title>24 dager med oss ❤️</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Romantisk håndskrift + klassisk serif + lesbar brødtekst -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        script: ['"Great Vibes"', 'cursive'],
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                    },
+                    colors: {
+                        velvet: {
+                            950: '#1f060b',
+                            900: '#330a13',
+                            800: '#4d101d',
+                            700: '#6b1729',
+                        },
+                        gold: {
+                            100: '#fbf3db',
+                            200: '#f5e2ad',
+                            300: '#ecc974',
+                            400: '#e0b048',
+                            500: '#c9932c',
+                        },
+                        pine: {
+                            800: '#163828',
+                            700: '#1f4e38',
+                        },
+                        cream: '#fdf8f2'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Bakgrunn med rik fløyelsfølelse og varm glød */
+        body {
+            background-color: #26070e;
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(168, 44, 68, 0.45) 0%, transparent 55%),
+                radial-gradient(circle at 15% 40%, rgba(224, 176, 72, 0.12) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(31, 78, 56, 0.28) 0%, transparent 50%),
+                linear-gradient(180deg, #380b15 0%, #24060d 50%, #1a0409 100%);
+            min-height: 100vh;
+            color: #fdf8f2;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Subtil papirstruktur over hele siden */
+        .paper-texture {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        /* Gull-shimmer tekst */
+        .gold-text-gradient {
+            background: linear-gradient(135deg, #fbf3db 0%, #ecc974 45%, #fff5d6 60%, #d49e35 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 4px 24px rgba(236, 201, 116, 0.25);
+        }
+
+        /* 3D-kort og lukeeffekter */
+        .door-perspective {
+            perspective: 1000px;
+        }
+
+        .door-card {
+            position: relative;
+            transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease;
+            transform-style: preserve-3d;
+        }
+
+        .door-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 14px 28px -8px rgba(0, 0, 0, 0.55), 0 0 18px rgba(236, 201, 116, 0.22);
+        }
+
+        .door-card:active {
+            transform: scale(0.97);
+        }
+
+        /* Stiplet gullsøm inni lukene */
+        .stitched-border {
+            border: 1px dashed rgba(236, 201, 116, 0.42);
+            transition: border-color 0.3s ease;
+        }
+
+        .door-card:hover .stitched-border {
+            border-color: rgba(236, 201, 116, 0.85);
+        }
+
+        /* Pulserende glød for dagens luke */
+        @keyframes pulseGlow {
+            0%, 100% {
+                box-shadow: 0 0 12px rgba(236, 201, 116, 0.25), inset 0 0 12px rgba(236, 201, 116, 0.15);
+            }
+            50% {
+                box-shadow: 0 0 24px rgba(236, 201, 116, 0.55), inset 0 0 18px rgba(236, 201, 116, 0.3);
+            }
+        }
+
+        .today-glow {
+            animation: pulseGlow 3s infinite ease-in-out;
+            border-color: rgba(236, 201, 116, 0.85) !important;
+        }
+
+        /* Åpnet luke-stil (varmt krem/gull-preg) */
+        .door-opened {
+            background: linear-gradient(145deg, rgba(253, 248, 242, 0.14) 0%, rgba(224, 176, 72, 0.12) 100%) !important;
+            border-color: rgba(236, 201, 116, 0.55) !important;
+        }
+
+        /* Julegrønn variant for utvalgte luker for ekstra dybde */
+        .door-pine {
+            background: linear-gradient(155deg, rgba(26, 66, 47, 0.88) 0%, rgba(16, 43, 30, 0.94) 100%);
+        }
+
+        /* Fløyelsrød variant */
+        .door-velvet {
+            background: linear-gradient(155deg, rgba(84, 19, 34, 0.88) 0%, rgba(48, 10, 19, 0.95) 100%);
+        }
+
+        /* Julaften (luke 24) gull-luksus */
+        .door-christmas-eve {
+            background: linear-gradient(145deg, rgba(133, 89, 20, 0.85) 0%, rgba(74, 21, 32, 0.95) 100%);
+            border-color: rgba(245, 226, 173, 0.75) !important;
+        }
+
+        /* Modal animasjon */
+        @keyframes modalPop {
+            0% {
+                opacity: 0;
+                transform: scale(0.88) translateY(16px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-animate {
+            animation: modalPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Flytende hjerter ved åpning */
+        @keyframes floatHeart {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(0.6) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--tx), var(--ty)) scale(1.3) rotate(var(--rot));
+            }
+        }
+
+        .floating-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatHeart 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        /* Rist-animasjon hvis luke er låst */
+        @keyframes gentleShake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-5px) rotate(-1deg); }
+            40% { transform: translateX(5px) rotate(1deg); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .shake {
+            animation: gentleShake 0.45s ease-in-out;
+        }
+
+        /* Lyslenke i toppen */
+        .fairy-light {
+            width: 8px;
+            height: 8px;
+            border-radius: 9999px;
+            background: #ffecb3;
+            box-shadow: 0 0 10px 3px rgba(255, 224, 130, 0.7);
+            animation: twinkle 2.8s infinite alternate ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.35; transform: scale(0.85); }
+            100% { opacity: 1; transform: scale(1.15); }
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold-400 selection:text-velvet-950">
+
+    <!-- Subtil papirstruktur -->
+    <div class="paper-texture"></div>
+
+    <!-- Canvas for dalende snøfnugg og varmt gullstøv -->
+    <canvas id="snowCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Dekorativ lyslenke øverst -->
+    <div class="relative z-10 w-full overflow-hidden pt-2 pb-1 pointer-events-none">
+        <div id="fairyLights" class="max-w-3xl mx-auto flex justify-between px-4 opacity-80"></div>
+    </div>
+
+    <!-- Hovedinnhold -->
+    <main class="relative z-10 max-w-2xl mx-auto px-4 pt-4 pb-16 sm:px-6">
+        
+        <!-- Topptekst / Header -->
+        <header class="text-center mb-8 sm:mb-10">
+            <!-- Lite romantisk emblem over tittelen -->
+            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-velvet-900/70 border border-gold-400/30 text-gold-200 text-xs tracking-widest uppercase mb-3 shadow-inner">
+                <span>✦</span>
+                <span>Desember</span>
+                <span>✦</span>
+            </div>
+
+            <h1 class="font-script text-5xl sm:text-6xl md:text-7xl gold-text-gradient leading-tight py-1">
+                24 dager med oss
+            </h1>
+
+            <p class="font-serif italic text-lg sm:text-xl text-gold-100/90 max-w-md mx-auto mt-2 leading-relaxed px-2">
+                Én liten luke hver dag frem til jul – noe vi gjør sammen, noe å glede seg til, og litt søtt på veien.
+            </p>
+
+            <!-- Fremdriftsindikator -->
+            <div class="mt-5 flex items-center justify-center gap-3 text-xs text-gold-200/75">
+                <div class="h-[1px] w-10 bg-gradient-to-r from-transparent to-gold-400/40"></div>
+                <span id="progressText" class="font-sans tracking-wide">0 av 24 luker åpnet</span>
+                <div class="h-[1px] w-10 bg-gradient-to-l from-transparent to-gold-400/40"></div>
+            </div>
+        </header>
+
+        <!-- Rutenett med de 24 lukene -->
+        <section aria-label="Adventsluker" id="calendarGrid" class="grid grid-cols-4 gap-2 sm:gap-4">
+            <!-- Genereres automatisk av JavaScript -->
+        </section>
+
+        <!-- Bunntekst med diskrete innstillinger -->
+        <footer class="mt-12 text-center space-y-4">
+            <div class="inline-flex items-center gap-2 text-gold-200/60 font-serif italic text-base">
+                <span>Laget med kjærlighet bare til deg</span>
+                <span class="text-rose-400">♥</span>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Liten toast-melding (brukes i stedet for alert når en luke er låst) -->
+    <div id="toastMessage" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none opacity-0 transition-all duration-300 transform translate-y-4">
+        <div class="bg-velvet-900/95 backdrop-blur-md text-gold-100 border border-gold-400/50 px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2.5 text-sm font-medium whitespace-nowrap">
+            <span>✨</span>
+            <span id="toastText">Ikke tjuvstart! Denne luken åpnes i desember.</span>
+        </div>
+    </div>
+
+    <!-- Kjærlighetsbrev / Modal når en luke åpnes -->
+    <div id="letterModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/75 backdrop-blur-sm" role="dialog" aria-modal="true">
+        <div id="modalCard" class="relative w-full max-w-md rounded-3xl bg-cream text-velvet-950 shadow-2xl overflow-hidden border-2 border-gold-400/80 modal-animate">
+            
+            <!-- Toppbanner på kortet -->
+            <div class="bg-gradient-to-r from-velvet-900 via-velvet-800 to-velvet-900 px-6 py-5 text-center relative border-b border-gold-400/40">
+                <!-- Lukkeknapp -->
+                <button id="closeModalBtn" type="button" aria-label="Lukk luke" class="absolute top-3.5 right-3.5 w-9 h-9 rounded-full bg-velvet-950/50 hover:bg-velvet-950 text-gold-200 flex items-center justify-center transition cursor-pointer border border-gold-400/30">
+                    ✕
+                </button>
+
+                <span id="modalDateBadge" class="inline-block text-xs uppercase tracking-widest text-gold-300 font-semibold mb-1">
+                    1. Desember
+                </span>
+                <h2 id="modalTitle" class="font-script text-4xl text-gold-100 leading-tight">
+                    Luke 1
+                </h2>
+            </div>
+
+            <!-- Innholdet i kjærlighetsbrevet -->
+            <div class="p-6 sm:p-8 text-center relative">
+                <!-- Dekorativt vannmerke -->
+                <div id="modalIcon" class="text-4xl mb-4 select-none">🕯️</div>
+
+                <!-- Tittel på dagens overraskelse -->
+                <h3 id="modalSubtitle" class="font-serif font-bold text-2xl sm:text-3xl text-velvet-900 mb-3">
+                    Varm kakao & julefilm
+                </h3>
+
+                <!-- Selve teksten / kjærlighetshilsenen -->
+                <p id="modalBody" class="font-sans text-velvet-800/90 text-base leading-relaxed mb-6">
+                    I kveld lager jeg verdens beste kakao med krem, og du får bestemme akkurat hvilken julefilm vi skal se under pleddet.
+                </p>
+
+                <!-- Signatur / Koselig avslutning -->
+                <div class="pt-4 border-t border-gold-500/25 flex flex-col items-center">
+                    <p id="modalNote" class="font-serif italic text-lg text-velvet-700">
+                        Gleder meg til i kveld med deg ❤️
+                    </p>
+                </div>
+
+                <!-- Handlingsknapp -->
+                <button id="confirmModalBtn" type="button" class="mt-6 w-full py-3 px-6 rounded-2xl bg-gradient-to-r from-velvet-800 to-velvet-900 hover:from-velvet-700 hover:to-velvet-800 text-gold-100 font-medium tracking-wide shadow-lg border border-gold-400/40 transition transform active:scale-98 cursor-pointer">
+                    Lagre i hjertet ♥
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =====================================================================
+           HER LEGGER DU INN DIN EGEN LISTE FOR DE 24 LUKENE!
+           Du trenger bare å endre tekstene inni klammeparentesene under.
+           - dag: Tallet på luken (1 til 24)
+           - tittel: Overskriften inni kortet
+           - tekst: Selve beskrivelsen av aktiviteten, gaven eller kjærlighetserklæringen
+           - hilsen: En liten koselig setning helt nederst på kortet
+           - ikon: Valgfri emoji som vises på kortet
+           ===================================================================== */
+        const kalenderLuker = [
+            { dag: 1, tittel: "Starten på desember sammen", tekst: "I kveld tenner vi det første kalenderlyset, lager varm kakao med krem og ser en skikkelig koselig julefilm under samme pledd.", hilsen: "Beste tiden på året fordi jeg får dele den med deg ❤️", ikon: "🕯️" },
+            { dag: 2, tittel: "Frokost på sengen", tekst: "I dag får du valgfri frokost og nytraktet kaffe eller te servert rett på sengen, helt uten at du trenger å løfte en finger.", hilsen: "God morgen, min favorittperson ☕", ikon: "🥐" },
+            { dag: 3, tittel: "Sushi til lunsj", tekst: "I dag slipper du å tenke på lunsj. Jeg bestiller sushi til deg, akkurat de bitene du har lyst på.", hilsen: "Craving godkjent 🍣", ikon: "🍣" },
+            { dag: 4, tittel: "Julekuler med ungene", tekst: "Vi tar med ungene og kjøper nye julekuler. Alle får velge sin egen kule til treet vårt i år.", hilsen: "Vår lille familie, snart litt større 🎄", ikon: "🔴" },
+            { dag: 5, tittel: "20 minutters rygg- og nakkemassasje", tekst: "Ingen tidspress, ingen mobiler. Bare rolig musikk og en skikkelig god massasje når du trenger å slappe helt av.", hilsen: "Kan løses inn når som helst i kveld 💆‍♀️", ikon: "🌿" },
+            { dag: 6, tittel: "Vi pynter juletreet", tekst: "Julemusikk på, alkoholfri gløgg i koppene og julekulene vi kjøpte, på treet. Etterpå ser vi julefilm sammen med ungene.", hilsen: "Ingenting er koseligere enn dette 🎄", ikon: "🎄" },
+            { dag: 7, tittel: "Du bestemmer middagen", tekst: "I dag bestemmer DU menyen 100 %. Om du vil ut og spise eller at jeg skal lage favorittretten din hjemme, så ordner jeg det!", hilsen: "Din personlige kokk står klar 🍝", ikon: "🍽️" },
+            { dag: 8, tittel: "Til deg", tekst: "Du er den som gjør alt jeg gjør verdt det. Du gjør så mye for meg, og jeg legger merke til det. Du er en så fantastisk mor for barna mine.", hilsen: "Elsker deg ❤️", ikon: "💌" },
+            { dag: 9, tittel: "Brettspillkveld", tekst: "Colakaker, snacks og noe godt å drikke på bordet, og så en skikkelig runde med favorittspillet vårt.", hilsen: "Måtte den beste vinne (men jeg lar deg kanskje vinne) 🎲", ikon: "🎲" },
+            { dag: 10, tittel: "Jeg tar alle kjedelige oppgaver i dag", tekst: "Oppvask, rydding og ærend. I dag tar jeg alt sammen, så du bare kan lene deg tilbake og nyte kvelden.", hilsen: "Fordi du fortjener en skikkelig pause 👑", ikon: "⭐" },
+            { dag: 11, tittel: "Navnekveld", tekst: "Vi lager hver vår liste med babynavn og leser dem høyt for hverandre, med drikke og snacks på bordet. Ingen navn er for rare å si høyt i kveld.", hilsen: "Snart får vi møte deg, lille venn 👶", ikon: "🍼" },
+            { dag: 12, tittel: "Julemarked-date", tekst: "Vi tar en tur på julemarkedet, kjenner lukten av brente mandler og koser oss sammen uten noen planer.", hilsen: "Gleder meg til å utforske med deg 🎡", ikon: "🧣" },
+            { dag: 13, tittel: "Sov så lenge du vil", tekst: "I dag tar jeg ungene om morgenen. Du sover så lenge du vil, og når du våkner, står frokosten klar.", hilsen: "Ingen vekkerklokke i dag 😴", ikon: "🌙" },
+            { dag: 14, tittel: "Takeaway fra favorittstedet", tekst: "Ingen matlaging i kveld. Jeg henter det cravingen din har lyst på fra favorittstedet ditt.", hilsen: "Du sier hva, jeg henter 🥡", ikon: "🥡" },
+            { dag: 15, tittel: "Ny pysj og sofakveld", tekst: "Det ligger en myk ny pysj til deg, med god plass til magen. Ta den på, så har vi sofakveld resten av kvelden.", hilsen: "Komfort først 🧸", ikon: "🎁" },
+            { dag: 16, tittel: "Ja-dag", tekst: "I kveld sier jeg ja til alt du ber om. Te, snacks, fotmassasje, din serie, du bestemmer.", hilsen: "Svaret er ja ❤️", ikon: "✅" },
+            { dag: 17, tittel: "I dag reiser vi", tekst: "I dag reiser vi over halve jorda sammen, du, jeg og ungene, og snart en til. Uansett hvor vi er, er det med deg jeg er hjemme.", hilsen: "Takk for at du er min ❤️", ikon: "✈️" },
+            { dag: 18, tittel: "Takeaway i San Diego", tekst: "Første kveld i San Diego. Vi tar det rolig og bestiller takeaway, så kan vi lande ordentlig sammen.", hilsen: "Ferien har begynt 🌴", ikon: "🌮" },
+            { dag: 19, tittel: "Kafédate", tekst: "Vi tar oss tid til en koselig kafédate, bare du og jeg.", hilsen: "Alltid tid til deg ☕", ikon: "☕" },
+            { dag: 20, tittel: "Sjøløver i La Jolla Cove", tekst: "Vi tar med ungene til La Jolla Cove og ser på sjøløvene og selene som soler seg på klippene.", hilsen: "Juleferie på vår måte 🦭", ikon: "🦭" },
+            { dag: 21, tittel: "Solnedgang på Sunset Cliffs", tekst: "Årets mørkeste dag hjemme, men her ser vi solen gå ned over Stillehavet sammen på Sunset Cliffs.", hilsen: "Du er solen min ☀️", ikon: "🌅" },
+            { dag: 22, tittel: "Lang frokost ute", tekst: "Vi tar en lang og rolig frokost på en kafé i nærheten, med pannekaker til alle.", hilsen: "Ingen planer, bare oss 🥞", ikon: "🥞" },
+            { dag: 23, tittel: "Lille julaften", tekst: "Takeaway og Grevinnen og hovmesteren, akkurat som hjemme. Litt Norge midt i California.", hilsen: "I morgen er det jul! 🎄", ikon: "📺" },
+            { dag: 24, tittel: "God jul, min elskede!", tekst: "24 dager har gått, men det aller beste er at jeg får feire julen, og resten av livet, sammen med deg. Jeg elsker deg over alt.", hilsen: "Din for alltid ❤️", ikon: "💍" }
+        ];
+
+        /* =====================================================================
+           APP-LOGIKK & ANIMASJONER (Du trenger ikke endre noe under her)
+           ===================================================================== */
+
+        // Standard: Datolås er AV slik at du enkelt kan teste alle lukene med en gang.
+        // Trykk på knappen nederst på siden (eller sett denne til true) for å låse til desember-datoene.
+        // Datolås er alltid på. Forhåndsvis alle luker med #forhandsvis på slutten av lenken.
+        const dateLockEnabled = location.hash !== '#forhandsvis';
+        let openedDoors = [];
+        try { openedDoors = JSON.parse(localStorage.getItem('loveCalendar_opened')) || []; } catch (e) {}
+        window.addEventListener('hashchange', () => location.reload());
+
+        const calendarGrid = document.getElementById('calendarGrid');
+        const progressText = document.getElementById('progressText');
+
+        // Modal-elementer
+        const letterModal = document.getElementById('letterModal');
+        const modalCard = document.getElementById('modalCard');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const confirmModalBtn = document.getElementById('confirmModalBtn');
+        const modalDateBadge = document.getElementById('modalDateBadge');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalIcon = document.getElementById('modalIcon');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const modalBody = document.getElementById('modalBody');
+        const modalNote = document.getElementById('modalNote');
+
+        // Små dekorative ikoner for lukene
+        const doorOrnaments = ['♥', '✦', '❄', '✧', '♥', '✶'];
+
+        // Oppdater lyslenken i toppen
+        function createFairyLights() {
+            const container = document.getElementById('fairyLights');
+            const count = window.innerWidth < 640 ? 12 : 20;
+            container.innerHTML = '';
+            for (let i = 0; i < count; i++) {
+                const bulb = document.createElement('div');
+                bulb.className = 'fairy-light';
+                bulb.style.animationDelay = `${(i * 0.25) % 2.8}s`;
+                if (i % 3 === 1) {
+                    bulb.style.background = '#ffccd5';
+                    bulb.style.boxShadow = '0 0 10px 3px rgba(255, 180, 195, 0.65)';
+                }
+                container.appendChild(bulb);
+            }
+        }
+
+        // Sjekk om en luke er lov å åpne hvis datolås er på
+        function isDoorUnlocked(day) {
+            if (!dateLockEnabled) return true;
+            const now = new Date();
+            // Måned 11 er desember i JavaScript (0-indeksert)
+            if (now.getMonth() === 11) return now.getDate() >= day;
+            return now.getMonth() === 0; // i januar kan hun bla i alle
+        }
+
+        // Sjekk om det er dagens luke i desember
+        function isTodayDoor(day) {
+            const now = new Date();
+            return now.getMonth() === 11 && now.getDate() === day;
+        }
+
+        // Vis en liten beskjed nederst (erstatter alert)
+        let toastTimeout;
+        function showToast(message) {
+            const toast = document.getElementById('toastMessage');
+            const toastText = document.getElementById('toastText');
+            toastText.textContent = message;
+            toast.classList.remove('opacity-0', 'translate-y-4');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-4');
+            }, 2800);
+        }
+
+        // Lag en liten sky av hjerter og gullstjerner når en luke åpnes
+        function spawnLoveConfetti(x, y) {
+            const symbols = ['❤️', '✨', '💛', '🤍', '❄️'];
+            for (let i = 0; i < 14; i++) {
+                const el = document.createElement('div');
+                el.className = 'floating-particle text-lg sm:text-xl select-none';
+                el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                
+                const angle = (Math.PI * 2 * i) / 14 + (Math.random() - 0.5) * 0.5;
+                const distance = 60 + Math.random() * 90;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance - 40;
+                const rot = (Math.random() - 0.5) * 90;
+
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
+                el.style.setProperty('--tx', `${tx}px`);
+                el.style.setProperty('--ty', `${ty}px`);
+                el.style.setProperty('--rot', `${rot}deg`);
+
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 1450);
+            }
+        }
+
+        // Åpne kjærlighetsbrevet i modalen
+        function openLetterModal(lukeData) {
+            modalDateBadge.textContent = `${lukeData.dag}. Desember`;
+            modalTitle.textContent = `Luke ${lukeData.dag}`;
+            modalIcon.textContent = lukeData.ikon || '❤️';
+            modalSubtitle.textContent = lukeData.tittel;
+            modalBody.textContent = lukeData.tekst;
+            modalNote.textContent = lukeData.hilsen || 'Med kjærlighet ❤️';
+
+            letterModal.classList.remove('hidden');
+            letterModal.classList.add('flex');
+            
+            // Restart modal-animasjon
+            modalCard.classList.remove('modal-animate');
+            void modalCard.offsetWidth;
+            modalCard.classList.add('modal-animate');
+        }
+
+        function closeLetterModal() {
+            letterModal.classList.add('hidden');
+            letterModal.classList.remove('flex');
+        }
+
+        // Tegn alle de 24 lukene
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+
+            kalenderLuker.forEach((luke, index) => {
+                const isOpened = openedDoors.includes(luke.dag);
+                const unlocked = isDoorUnlocked(luke.dag);
+                const isToday = isTodayDoor(luke.dag);
+
+                // Varier bakgrunnsfarge subtilt for et rikere julepreg
+                let colorThemeClass = 'door-velvet';
+                if (luke.dag === 24) {
+                    colorThemeClass = 'door-christmas-eve';
+                } else if (luke.dag % 5 === 0 || luke.dag === 12) {
+                    colorThemeClass = 'door-pine';
+                }
+
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.setAttribute('aria-label', `Luke ${luke.dag}${isOpened ? ' (åpnet)' : ''}`);
+                
+                button.className = `
+                    door-perspective door-card group relative aspect-square sm:aspect-[4/4.6] w-full rounded-xl sm:rounded-2xl p-1 sm:p-2.5
+                    border border-gold-400/35 shadow-lg cursor-pointer flex flex-col items-center justify-center
+                    ${colorThemeClass}
+                    ${isOpened ? 'door-opened' : ''}
+                    ${isToday && !isOpened ? 'today-glow' : ''}
+                `;
+
+                const ornament = doorOrnaments[index % doorOrnaments.length];
+
+                button.innerHTML = `
+                    <div class="stitched-border w-full h-full rounded-lg sm:rounded-xl flex flex-col items-center justify-between py-1.5 sm:py-2.5 px-1 relative overflow-hidden">
+                        
+                        <!-- Topp-ornament eller status -->
+                        <div class="text-[9px] sm:text-xs tracking-wider whitespace-nowrap ${isOpened ? 'text-gold-300' : 'text-gold-300/60'}">
+                            ${isOpened ? '✓ Åpnet' : (!unlocked ? '🔒' : ornament)}
+                        </div>
+
+                        <!-- Selve luketallet -->
+                        <div class="font-serif font-bold ${luke.dag === 24 ? 'text-3xl sm:text-5xl text-gold-200' : 'text-2xl sm:text-4xl text-gold-100'} group-hover:scale-110 transition-transform duration-300 select-none">
+                            ${luke.dag}
+                        </div>
+
+                        <!-- Nederste detalj: Viser dagens ikon hvis åpnet, ellers en liten gull-sløyfe/emblem -->
+                        <div class="h-5 flex items-center justify-center">
+                            ${isOpened 
+                                ? `<span class="text-base sm:text-lg transform group-hover:scale-125 transition-transform">${luke.ikon || '❤️'}</span>` 
+                                : `<span class="w-3.5 h-3.5 rounded-sm bg-gold-400/20 border border-gold-400/40 group-hover:bg-gold-400/40 transition-colors flex items-center justify-center text-[8px] text-gold-200">♥</span>`
+                            }
+                        </div>
+
+                        <!-- Subtil gullglans ved hover -->
+                        <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-gold-200/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                    </div>
+                `;
+
+                button.addEventListener('click', (e) => {
+                    if (!isDoorUnlocked(luke.dag)) {
+                        button.classList.remove('shake');
+                        void button.offsetWidth;
+                        button.classList.add('shake');
+                        showToast(`Ikke tjuvstart! Luke ${luke.dag} åpnes ${luke.dag}. desember ❤️`);
+                        return;
+                    }
+
+                    // Marker som åpnet hvis den ikke var åpnet fra før
+                    if (!openedDoors.includes(luke.dag)) {
+                        openedDoors.push(luke.dag);
+                        try { localStorage.setItem('loveCalendar_opened', JSON.stringify(openedDoors)); } catch (e) {}
+                        
+                        // Hent posisjon for hjerte-konfetti
+                        const rect = button.getBoundingClientRect();
+                        spawnLoveConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+                        
+                        renderCalendar();
+                        updateProgress();
+                    }
+
+                    openLetterModal(luke);
+                });
+
+                calendarGrid.appendChild(button);
+            });
+        }
+
+        function updateProgress() {
+            progressText.textContent = `${openedDoors.length} av 24 luker åpnet`;
+        }
+
+        // Event listeners for knapper og modal
+        closeModalBtn.addEventListener('click', closeLetterModal);
+        confirmModalBtn.addEventListener('click', closeLetterModal);
+        letterModal.addEventListener('click', (e) => {
+            if (e.target === letterModal) closeLetterModal();
+        });
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !letterModal.classList.contains('hidden')) {
+                closeLetterModal();
+            }
+        });
+
+        /* =====================================================================
+           BAKGRUNNSANIMASJON: Mykt dalende snøfnugg og varmt gullstøv
+           ===================================================================== */
+        const canvas = document.getElementById('snowCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(55, Math.floor((window.innerWidth * window.innerHeight) / 18000));
+            for (let i = 0; i < count; i++) {
+                const isGold = Math.random() > 0.65;
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: isGold ? Math.random() * 2.2 + 0.8 : Math.random() * 2.6 + 1,
+                    speedY: Math.random() * 0.55 + 0.2,
+                    speedX: (Math.random() - 0.5) * 0.35,
+                    opacity: Math.random() * 0.55 + 0.2,
+                    isGold: isGold,
+                    phase: Math.random() * Math.PI * 2
+                });
+            }
+        }
+
+        function animateSnow() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.y += p.speedY;
+                p.phase += 0.015;
+                p.x += p.speedX + Math.sin(p.phase) * 0.25;
+
+                if (p.y > canvas.height + 10) {
+                    p.y = -10;
+                    p.x = Math.random() * canvas.width;
+                }
+                if (p.x > canvas.width + 10) p.x = -10;
+                if (p.x < -10) p.x = canvas.width + 10;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                
+                if (p.isGold) {
+                    const pulse = 0.7 + Math.sin(p.phase * 2) * 0.3;
+                    ctx.fillStyle = `rgba(245, 215, 130, ${p.opacity * pulse})`;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = 'rgba(245, 215, 130, 0.6)';
+                } else {
+                    ctx.fillStyle = `rgba(255, 250, 245, ${p.opacity * 0.75})`;
+                    ctx.shadowBlur = 0;
+                }
+                
+                ctx.fill();
+            });
+
+            requestAnimationFrame(animateSnow);
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            createFairyLights();
+        });
+
+        window.onload = function () {
+            resizeCanvas();
+            initParticles();
+            animateSnow();
+            createFairyLights();
+            updateProgress();
+            renderCalendar();
+        };
+    </script>
+</body>
+</html>
