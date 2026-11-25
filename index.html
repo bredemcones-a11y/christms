@@ -469,9 +469,10 @@
         // Standard: Datolås er AV slik at du enkelt kan teste alle lukene med en gang.
         // Trykk på knappen nederst på siden (eller sett denne til true) for å låse til desember-datoene.
         // Datolås er alltid på. Forhåndsvis alle luker med #forhandsvis på slutten av lenken.
-        const dateLockEnabled = location.hash !== '#forhandsvis';
+        const isPreview = location.hash === '#forhandsvis';
+        const dateLockEnabled = !isPreview;
         let openedDoors = [];
-        try { openedDoors = JSON.parse(localStorage.getItem('loveCalendar_opened')) || []; } catch (e) {}
+        if (!isPreview) { try { openedDoors = JSON.parse(localStorage.getItem('loveCalendar_opened')) || []; } catch (e) {} }
         window.addEventListener('hashchange', () => location.reload());
 
         const calendarGrid = document.getElementById('calendarGrid');
@@ -707,9 +708,9 @@
                         return;
                     }
 
-                    if (!openedDoors.includes(luke.dag)) {
-                        openedDoors.push(luke.dag);
-                        try { localStorage.setItem('loveCalendar_opened', JSON.stringify(openedDoors)); } catch (e) {}
+                    if (isPreview || !openedDoors.includes(luke.dag)) {
+                        if (!openedDoors.includes(luke.dag)) openedDoors.push(luke.dag);
+                        if (!isPreview) { try { localStorage.setItem('loveCalendar_opened', JSON.stringify(openedDoors)); } catch (e) {} }
                         playDoorOpen(button, luke);
                     } else {
                         openLetterModal(luke, button.getBoundingClientRect());
